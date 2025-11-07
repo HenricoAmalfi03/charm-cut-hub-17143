@@ -169,7 +169,7 @@ export default function ClientAuth() {
         barbeiro_id: barbeiroSelecionado,
         servico_id: servicoSelecionado,
         data_hora: dataHora.toISOString(),
-        status: 'agendado'
+        status: 'pendente'
       });
 
       if (error) throw error;
