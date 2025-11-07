@@ -36,6 +36,7 @@ export default function AdminBarbeiros() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -84,7 +85,7 @@ export default function AdminBarbeiros() {
         p_nome: fullName,
         p_email: email,
         p_senha: password,
-        p_telefone: ''
+        p_whatsapp: whatsapp
       });
 
       if (error) throw error;
@@ -98,6 +99,7 @@ export default function AdminBarbeiros() {
       setEmail('');
       setPassword('');
       setFullName('');
+      setWhatsapp('');
       fetchBarbeiros();
     } catch (error: any) {
       toast({
@@ -207,9 +209,18 @@ export default function AdminBarbeiros() {
                     placeholder="Mínimo 6 caracteres"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp">WhatsApp</Label>
+                  <Input
+                    id="whatsapp"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
                 <Button 
                   onClick={handleCreateBarbeiro} 
-                  disabled={creating || !email || !password || !fullName}
+                  disabled={creating || !email || !password || !fullName || !whatsapp}
                   className="w-full"
                 >
                   <UserPlus className="h-4 w-4 mr-2" />

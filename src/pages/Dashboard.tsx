@@ -100,6 +100,17 @@ export default function Dashboard() {
           <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader>
               <Settings className="h-8 w-8 text-primary mb-2" />
+              <CardTitle>Configurações</CardTitle>
+              <CardDescription>Nome, logo e endereço</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full" onClick={() => navigate('/admin/configuracoes')}>Configurar</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/20 hover:border-primary/40 transition-colors">
+            <CardHeader>
+              <Settings className="h-8 w-8 text-primary mb-2" />
               <CardTitle>Meu Perfil</CardTitle>
               <CardDescription>Editar informações</CardDescription>
             </CardHeader>

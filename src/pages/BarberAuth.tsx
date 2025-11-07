@@ -134,21 +134,28 @@ export default function BarberAuth() {
     try {
       const { error } = await supabase
         .from('agendamentos')
-        .update({ status: novoStatus })
+        .update({ 
+          status: novoStatus,
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', agendamentoId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao atualizar status:', error);
+        throw error;
+      }
 
       toast({
-        title: 'Status atualizado!',
-        description: 'O agendamento foi atualizado com sucesso',
+        title: 'Sucesso',
+        description: 'Status atualizado com sucesso',
       });
 
-      fetchAgendamentos();
+      await fetchAgendamentos();
     } catch (error: any) {
+      console.error('Erro completo:', error);
       toast({
         title: 'Erro',
-        description: error.message,
+        description: error.message || 'Não foi possível atualizar o status',
         variant: 'destructive',
       });
     }

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { useConfigBarbearia } from '@/hooks/useConfigBarbearia';
 import { Scissors, Calendar, Users, Star } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const { config } = useConfigBarbearia();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +32,7 @@ const Index = () => {
               </div>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-              Barbearia <span className="text-primary">Premium</span>
+              Barbearia <span className="text-primary">{config.nome_estabelecimento}</span>
             </h1>
             <p className="text-xl text-muted-foreground">
               Estilo, elegância e tradição em um só lugar. Agende seu horário com os melhores barbeiros da cidade.
@@ -107,6 +109,15 @@ const Index = () => {
           </Button>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm py-6">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <p className="text-sm">
+            Barbearia {config.nome_estabelecimento} • {config.endereco}
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

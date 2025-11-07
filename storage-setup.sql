@@ -1,86 +1,45 @@
 -- =====================================================
--- BARBEARIA PREMIUM - STORAGE SETUP
+-- STORAGE SETUP - BARBEARIA BUCKET
 -- =====================================================
--- Execute este script DEPOIS do database-schema.sql
 
--- =============================
--- CLEANUP
--- =============================
-DROP POLICY IF EXISTS "Public can view files" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated can upload avatars" ON storage.objects;
-DROP POLICY IF EXISTS "Users can update own files" ON storage.objects;
-DROP POLICY IF EXISTS "Users can delete own files" ON storage.objects;
-DROP POLICY IF EXISTS "Admins can manage all files" ON storage.objects;
-
--- Remover bucket se existir
-DELETE FROM storage.buckets WHERE id = 'barbearia';
-
--- =============================
--- CRIAR BUCKET
--- =============================
-INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES (
+-- Criar bucket 'barbearia' para armazenar imagens
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
   'barbearia',
   'barbearia',
-  TRUE,
-  2097152, -- 2MB
-  ARRAY['image/jpeg', 'image/png', 'image/webp']
+  true,
+  5242880, -- 5MB limit
+  array['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 )
-ON CONFLICT (id) DO UPDATE SET
-  public = TRUE,
-  file_size_limit = 2097152,
-  allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp'];
+on conflict (id) do update set
+  public = true,
+  file_size_limit = 5242880,
+  allowed_mime_types = array['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
--- =============================
--- POLICIES
--- =============================
+-- Habilitar RLS no storage
+alter table storage.objects enable row level security;
 
--- Qualquer um pode ver arquivos públicos
-CREATE POLICY "Public can view files"
-  ON storage.objects FOR SELECT
-  TO public
-  USING (bucket_id = 'barbearia');
+-- RLS policies para o bucket barbearia
+drop policy if exists "Public Access" on storage.objects;
+drop policy if exists "Authenticated users can upload" on storage.objects;
+drop policy if exists "Users can update uploads" on storage.objects;
+drop policy if exists "Users can delete uploads" on storage.objects;
 
--- Usuários autenticados podem fazer upload (pasta avatars)
-CREATE POLICY "Authenticated can upload avatars"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    bucket_id = 'barbearia'
-    AND (storage.foldername(name))[1] = 'avatars'
-  );
+create policy "Public Access"
+on storage.objects for select
+using ( bucket_id = 'barbearia' );
 
--- Usuários podem atualizar seus próprios arquivos
-CREATE POLICY "Users can update own files"
-  ON storage.objects FOR UPDATE
-  TO authenticated
-  USING (
-    bucket_id = 'barbearia'
-    AND (owner_id IS NULL OR owner_id::text = auth.uid()::text)
-  )
-  WITH CHECK (
-    bucket_id = 'barbearia'
-    AND (owner_id IS NULL OR owner_id::text = auth.uid()::text)
-  );
+create policy "Authenticated users can upload"
+on storage.objects for insert
+with check (
+  bucket_id = 'barbearia' 
+  and auth.role() = 'authenticated'
+);
 
--- Usuários podem deletar seus próprios arquivos
-CREATE POLICY "Users can delete own files"
-  ON storage.objects FOR DELETE
-  TO authenticated
-  USING (
-    bucket_id = 'barbearia'
-    AND (owner_id IS NULL OR owner_id::text = auth.uid()::text)
-  );
+create policy "Users can update uploads"
+on storage.objects for update
+using ( bucket_id = 'barbearia' and auth.role() = 'authenticated' );
 
--- Admins podem gerenciar todos os arquivos
-CREATE POLICY "Admins can manage all files"
-  ON storage.objects FOR ALL
-  TO authenticated
-  USING (
-    bucket_id = 'barbearia'
-    AND public.is_admin(auth.uid())
-  )
-  WITH CHECK (
-    bucket_id = 'barbearia'
-    AND public.is_admin(auth.uid())
-  );
+create policy "Users can delete uploads"
+on storage.objects for delete
+using ( bucket_id = 'barbearia' and auth.role() = 'authenticated' );

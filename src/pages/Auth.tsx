@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { Scissors } from 'lucide-react';
+import { Scissors, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Auth() {
@@ -50,6 +50,12 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-card p-4">
+      <div className="absolute top-4 left-4">
+        <Button variant="ghost" onClick={() => navigate('/')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      </div>
       <Card className="w-full max-w-md border-primary/20">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center mb-2">
