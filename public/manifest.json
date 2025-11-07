@@ -1,7 +1,7 @@
 {
-  "name": "Charm & Cut Hub",
+  "name": "Barbearia BRAVO-II",
   "short_name": "CharmCut",
-  "description": "App de agendamento e gestão para barbearias — Charm & Cut Hub.",
+  "description": "App de agendamento e gestão para barbearias - BRAVO-II.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -10,7 +10,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "public": "/favicon.ico",
+      "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }
