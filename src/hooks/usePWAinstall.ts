@@ -6,13 +6,20 @@ export function usePWAInstall() {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: any) => {
-      // Evita que o navegador exiba o prompt automaticamente
+      // Impede o navegador de exibir o prompt automaticamente
       event.preventDefault();
+      console.log("[PWA] Evento beforeinstallprompt detectado.");
       setDeferredPrompt(event);
       setIsInstallable(true);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Verifica se já está instalado
+    window.addEventListener("appinstalled", () => {
+      console.log("[PWA] Aplicativo instalado com sucesso!");
+      setIsInstallable(false);
+    });
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
@@ -21,21 +28,16 @@ export function usePWAInstall() {
 
   const installApp = async () => {
     if (!deferredPrompt) {
-      console.warn("Evento beforeinstallprompt ainda não disponível.");
+      alert("O app ainda não está pronto para instalação. Tente atualizar a página.");
+      console.warn("[PWA] Evento beforeinstallprompt ainda não disponível.");
       return;
     }
 
-    // Exibe o prompt nativo do navegador
     deferredPrompt.prompt();
 
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      console.log("Usuário aceitou instalar o PWA.");
-    } else {
-      console.log("Usuário recusou instalar o PWA.");
-    }
+    console.log(`[PWA] Instalação: ${outcome}`);
 
-    // Limpa o estado após uso
     setDeferredPrompt(null);
     setIsInstallable(false);
   };
