@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Scissors, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Scissors, Calendar, Clock, MessageCircle, User, Camera } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -15,15 +15,16 @@ interface Agendamento {
   data_hora: string;
   status: string;
   observacoes: string | null;
-  clientes: {
+  cliente: {
     nome_completo: string;
     telefone: string;
-  }[];
-  servicos: {
+    whatsapp: string;
+  };
+  servico: {
     nome: string;
     preco: number;
     duracao_minutos: number;
-  }[];
+  };
 }
 
 export default function BarberAuth() {
@@ -35,10 +36,15 @@ export default function BarberAuth() {
   const [loading, setLoading] = useState(false);
   const [barbeiroLogado, setBarbeiroLogado] = useState<any>(null);
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [whatsappEdit, setWhatsappEdit] = useState('');
+  const [avatarUrlEdit, setAvatarUrlEdit] = useState('');
 
   useEffect(() => {
     if (barbeiroLogado) {
       fetchAgendamentos();
+      setWhatsappEdit(barbeiroLogado.whatsapp || '');
+      setAvatarUrlEdit(barbeiroLogado.avatar_url || '');
     }
   }, [barbeiroLogado]);
 
@@ -54,15 +60,32 @@ export default function BarberAuth() {
           data_hora,
           status,
           observacoes,
-          clientes (nome_completo, telefone),
-          servicos (nome, preco, duracao_minutos)
+          cliente_id,
+          servico_id
         `)
         .eq('barbeiro_id', barbeiroLogado.id)
         .gte('data_hora', hoje.toISOString())
         .order('data_hora', { ascending: true });
 
       if (error) throw error;
-      setAgendamentos(data || []);
+
+      // Buscar dados relacionados manualmente
+      const agendamentosCompletos = await Promise.all(
+        (data || []).map(async (agendamento: any) => {
+          const [clienteRes, servicoRes] = await Promise.all([
+            supabase.from('clientes').select('nome_completo, telefone, whatsapp').eq('id', agendamento.cliente_id).single(),
+            supabase.from('servicos').select('nome, preco, duracao_minutos').eq('id', agendamento.servico_id).single()
+          ]);
+
+          return {
+            ...agendamento,
+            cliente: clienteRes.data,
+            servico: servicoRes.data
+          };
+        })
+      );
+
+      setAgendamentos(agendamentosCompletos);
     } catch (error: any) {
       console.error('Erro ao buscar agendamentos:', error);
     }
@@ -143,6 +166,38 @@ export default function BarberAuth() {
     return colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20';
   };
 
+  const handleUpdatePerfil = async () => {
+    try {
+      const { error } = await supabase
+        .from('barbeiros')
+        .update({
+          whatsapp: whatsappEdit,
+          avatar_url: avatarUrlEdit
+        })
+        .eq('id', barbeiroLogado.id);
+
+      if (error) throw error;
+
+      setBarbeiroLogado({ ...barbeiroLogado, whatsapp: whatsappEdit, avatar_url: avatarUrlEdit });
+      setEditandoPerfil(false);
+      toast({
+        title: 'Perfil atualizado!',
+        description: 'Suas informações foram atualizadas com sucesso',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const abrirWhatsApp = (telefone: string) => {
+    const numero = telefone.replace(/\D/g, '');
+    window.open(`https://wa.me/55${numero}`, '_blank');
+  };
+
   if (barbeiroLogado) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-card p-4">
@@ -162,7 +217,54 @@ export default function BarberAuth() {
                 Olá, {barbeiroLogado.nome_completo}! Gerencie seus agendamentos
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                <div className="relative">
+                  {barbeiroLogado.avatar_url ? (
+                    <img src={barbeiroLogado.avatar_url} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-8 w-8 text-primary" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold">{barbeiroLogado.nome_completo}</p>
+                  <p className="text-sm text-muted-foreground">{barbeiroLogado.email}</p>
+                  {barbeiroLogado.whatsapp && (
+                    <p className="text-sm text-muted-foreground">WhatsApp: {barbeiroLogado.whatsapp}</p>
+                  )}
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setEditandoPerfil(!editandoPerfil)}>
+                  {editandoPerfil ? 'Cancelar' : 'Editar'}
+                </Button>
+              </div>
+
+              {editandoPerfil && (
+                <div className="space-y-3 p-4 border border-border rounded-lg">
+                  <div className="space-y-2">
+                    <Label>WhatsApp</Label>
+                    <Input 
+                      value={whatsappEdit} 
+                      onChange={(e) => setWhatsappEdit(e.target.value)} 
+                      placeholder="(00) 00000-0000" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>URL da Foto</Label>
+                    <Input 
+                      value={avatarUrlEdit} 
+                      onChange={(e) => setAvatarUrlEdit(e.target.value)} 
+                      placeholder="https://exemplo.com/foto.jpg" 
+                    />
+                  </div>
+                  <Button onClick={handleUpdatePerfil} className="w-full">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Salvar Alterações
+                  </Button>
+                </div>
+              )}
+
               <Button variant="outline" onClick={() => setBarbeiroLogado(null)} className="w-full">
                 Sair
               </Button>
@@ -196,15 +298,15 @@ export default function BarberAuth() {
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium">{agendamento.clientes[0]?.nome_completo}</p>
-                          <p className="text-sm text-muted-foreground">{agendamento.clientes[0]?.telefone}</p>
+                          <p className="font-medium">{agendamento.cliente?.nome_completo}</p>
+                          <p className="text-sm text-muted-foreground">{agendamento.cliente?.telefone}</p>
                         </div>
                         <div>
                           <p className="text-sm">
-                            <span className="font-medium">{agendamento.servicos[0]?.nome}</span> - R$ {agendamento.servicos[0]?.preco.toFixed(2)}
+                            <span className="font-medium">{agendamento.servico?.nome}</span> - R$ {agendamento.servico?.preco?.toFixed(2)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Duração: {agendamento.servicos[0]?.duracao_minutos} minutos
+                            Duração: {agendamento.servico?.duracao_minutos} minutos
                           </p>
                         </div>
                         {agendamento.observacoes && (
@@ -218,6 +320,16 @@ export default function BarberAuth() {
                       </div>
 
                       <div className="flex flex-col gap-2 min-w-[150px]">
+                        {agendamento.cliente?.whatsapp && (
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => abrirWhatsApp(agendamento.cliente.whatsapp)}
+                          >
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Mensagem
+                          </Button>
+                        )}
                         {agendamento.status === 'pendente' && (
                           <Button 
                             size="sm" 

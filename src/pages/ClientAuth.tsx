@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 interface Barbeiro {
   id: string;
   nome_completo: string;
+  avatar_url: string;
 }
 
 interface Servico {
@@ -37,6 +38,7 @@ export default function ClientAuth() {
   const [senha, setSenha] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [telefone, setTelefone] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   const [loading, setLoading] = useState(false);
   
   // Cliente logado
@@ -57,7 +59,7 @@ export default function ClientAuth() {
   const fetchBarbeirosEServicos = async () => {
     try {
       const [barbeirosRes, servicosRes] = await Promise.all([
-        supabase.from('barbeiros').select('id, nome_completo').eq('ativo', true),
+        supabase.from('barbeiros').select('id, nome_completo, avatar_url').eq('ativo', true),
         supabase.from('servicos').select('*').eq('ativo', true)
       ]);
 
@@ -84,7 +86,8 @@ export default function ClientAuth() {
         p_nome: nomeCompleto,
         p_email: email,
         p_senha: senha,
-        p_telefone: telefone
+        p_telefone: telefone,
+        p_whatsapp: whatsapp || telefone
       });
 
       if (error) throw error;
@@ -97,6 +100,7 @@ export default function ClientAuth() {
       setIsLogin(true);
       setNomeCompleto('');
       setTelefone('');
+      setWhatsapp('');
     } catch (error: any) {
       toast({
         title: 'Erro',
@@ -229,7 +233,16 @@ export default function ClientAuth() {
                   </SelectTrigger>
                   <SelectContent>
                     {barbeiros.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>{b.nome_completo}</SelectItem>
+                      <SelectItem key={b.id} value={b.id}>
+                        <div className="flex items-center gap-2">
+                          {b.avatar_url ? (
+                            <img src={b.avatar_url} alt={b.nome_completo} className="w-6 h-6 rounded-full object-cover" />
+                          ) : (
+                            <User className="h-6 w-6 text-muted-foreground" />
+                          )}
+                          {b.nome_completo}
+                        </div>
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -335,6 +348,11 @@ export default function ClientAuth() {
                 <div className="space-y-2">
                   <Label>Telefone</Label>
                   <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(00) 00000-0000" />
+                </div>
+                <div className="space-y-2">
+                  <Label>WhatsApp (opcional)</Label>
+                  <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" />
+                  <p className="text-xs text-muted-foreground">Se vazio, usaremos o telefone</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Senha</Label>

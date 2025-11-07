@@ -76,6 +76,7 @@ CREATE TABLE public.clientes (
   email TEXT UNIQUE NOT NULL,
   senha_hash TEXT NOT NULL,
   telefone TEXT,
+  whatsapp TEXT,
   avatar_url TEXT,
   ativo BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -92,6 +93,7 @@ CREATE TABLE public.barbeiros (
   email TEXT UNIQUE NOT NULL,
   senha_hash TEXT NOT NULL,
   telefone TEXT,
+  whatsapp TEXT,
   avatar_url TEXT,
   especialidades TEXT[] DEFAULT ARRAY[]::TEXT[],
   horario_inicio TIME DEFAULT '09:00',
@@ -167,7 +169,8 @@ CREATE OR REPLACE FUNCTION public.create_barbeiro(
     p_nome TEXT,
     p_email TEXT,
     p_senha TEXT,
-    p_telefone TEXT DEFAULT ''
+    p_telefone TEXT DEFAULT '',
+    p_whatsapp TEXT DEFAULT ''
 ) RETURNS UUID
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
@@ -186,9 +189,9 @@ BEGIN
 
     -- Criar barbeiro (senha em texto puro)
     INSERT INTO public.barbeiros (
-        nome_completo, email, senha_hash, telefone
+        nome_completo, email, senha_hash, telefone, whatsapp
     ) VALUES (
-        p_nome, LOWER(TRIM(p_email)), p_senha, p_telefone
+        p_nome, LOWER(TRIM(p_email)), p_senha, p_telefone, p_whatsapp
     )
     RETURNING id INTO v_barbeiro_id;
 
@@ -204,7 +207,8 @@ CREATE OR REPLACE FUNCTION public.create_cliente(
     p_nome TEXT,
     p_email TEXT,
     p_senha TEXT,
-    p_telefone TEXT DEFAULT ''
+    p_telefone TEXT DEFAULT '',
+    p_whatsapp TEXT DEFAULT ''
 ) RETURNS UUID
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
@@ -223,9 +227,9 @@ BEGIN
 
     -- Criar cliente (senha em texto puro)
     INSERT INTO public.clientes (
-        nome_completo, email, senha_hash, telefone
+        nome_completo, email, senha_hash, telefone, whatsapp
     ) VALUES (
-        p_nome, LOWER(TRIM(p_email)), p_senha, p_telefone
+        p_nome, LOWER(TRIM(p_email)), p_senha, p_telefone, p_whatsapp
     )
     RETURNING id INTO v_cliente_id;
 
@@ -245,6 +249,7 @@ CREATE OR REPLACE FUNCTION public.authenticate_barbeiro(
     nome_completo TEXT,
     email TEXT,
     telefone TEXT,
+    whatsapp TEXT,
     avatar_url TEXT,
     especialidades TEXT[],
     ativo BOOLEAN
@@ -252,7 +257,7 @@ CREATE OR REPLACE FUNCTION public.authenticate_barbeiro(
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
     RETURN QUERY
-        SELECT b.id, b.nome_completo, b.email, b.telefone, b.avatar_url, b.especialidades, b.ativo
+        SELECT b.id, b.nome_completo, b.email, b.telefone, b.whatsapp, b.avatar_url, b.especialidades, b.ativo
         FROM public.barbeiros b
         WHERE b.email = LOWER(TRIM(p_email))
           AND b.senha_hash = p_senha -- comparação direta!
@@ -272,13 +277,14 @@ CREATE OR REPLACE FUNCTION public.authenticate_cliente(
     nome_completo TEXT,
     email TEXT,
     telefone TEXT,
+    whatsapp TEXT,
     avatar_url TEXT,
     ativo BOOLEAN
 )
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
     RETURN QUERY
-        SELECT c.id, c.nome_completo, c.email, c.telefone, c.avatar_url, c.ativo
+        SELECT c.id, c.nome_completo, c.email, c.telefone, c.whatsapp, c.avatar_url, c.ativo
         FROM public.clientes c
         WHERE c.email = LOWER(TRIM(p_email))
           AND c.senha_hash = p_senha -- comparação direta!
