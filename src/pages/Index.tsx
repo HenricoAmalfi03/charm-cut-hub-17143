@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { usePWAInstall } from '@/hooks/usePWAInstall'; // Certifique-se de importar o hook
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useConfigBarbearia } from '@/hooks/useConfigBarbearia';
 import { Scissors, Calendar, Users, Star } from 'lucide-react';
 
@@ -40,8 +40,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" onClick={() => navigate('/cliente/auth')} className="text-lg">
-                <Calendar className="mr-2 h-5 w-5" />
-                Agendar Horário
+                <Calendar className="mr-2 h-5 w-5" /> Agendar Horário
               </Button>
               <Button size="lg" variant="outline" onClick={() => navigate('/admin/auth')} className="text-lg">
                 Administrador
