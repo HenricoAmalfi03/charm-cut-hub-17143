@@ -36,17 +36,8 @@ DROP TYPE IF EXISTS public.status_agendamento CASCADE;
 -- =============================
 -- EXTENSIONS
 -- =============================
--- IMPORTANTE: Execute como superuser ou via Dashboard do Supabase
--- Se der erro de permissão, execute via SQL Editor do Supabase Dashboard
-CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
--- Fallback: caso o schema extensions não exista
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pgcrypto') THEN
-    CREATE EXTENSION IF NOT EXISTS pgcrypto;
-  END IF;
-END
-$$;
+-- Habilitar extensão para criptografia (bcrypt)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =============================
 -- TYPES
