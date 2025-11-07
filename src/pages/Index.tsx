@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { InstallPrompt } from '@/components/InstallPrompt';
+import { usePWAInstall } from '@/hooks/usePWAInstall'; // Certifique-se de importar o hook
 import { useConfigBarbearia } from '@/hooks/useConfigBarbearia';
 import { Scissors, Calendar, Users, Star } from 'lucide-react';
 
@@ -10,6 +10,9 @@ const Index = () => {
   const { user, loading } = useAuth();
   const { config } = useConfigBarbearia();
   const navigate = useNavigate();
+
+  // Hook para PWA
+  const { isInstallable, installApp } = usePWAInstall();
 
   useEffect(() => {
     if (user && !loading) {
@@ -19,8 +22,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-card">
-      <InstallPrompt />
-      
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
@@ -48,6 +49,22 @@ const Index = () => {
               <Button size="lg" variant="outline" onClick={() => navigate('/barbeiro/auth')} className="text-lg">
                 Sou Barbeiro
               </Button>
+              {isInstallable && (
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  onClick={installApp}
+                  className="text-lg flex items-center"
+                >
+                  <img
+                    src="/favicon.ico"
+                    alt="App Icon"
+                    className="mr-2 h-5 w-5"
+                    style={{ borderRadius: 4 }}
+                  />
+                  Instale o APP
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -69,7 +86,6 @@ const Index = () => {
                 Barbeiros experientes e apaixonados pela arte de cuidar do seu visual
               </p>
             </div>
-
             <div className="text-center space-y-4 p-6 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
               <div className="flex justify-center">
                 <div className="p-3 rounded-full bg-primary/10">
@@ -81,7 +97,6 @@ const Index = () => {
                 Sistema online prático para agendar seu horário quando e onde quiser
               </p>
             </div>
-
             <div className="text-center space-y-4 p-6 rounded-lg border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
               <div className="flex justify-center">
                 <div className="p-3 rounded-full bg-primary/10">
