@@ -88,12 +88,12 @@ export default function Dashboard() {
 
           <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader>
-              <Settings className="h-8 w-8 text-primary mb-2" />
+              <Scissors className="h-8 w-8 text-primary mb-2" />
               <CardTitle>Serviços</CardTitle>
               <CardDescription>Gerenciar serviços e valores</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">Configurar</Button>
+              <Button className="w-full" onClick={() => navigate('/admin/servicos')}>Configurar</Button>
             </CardContent>
           </Card>
 
