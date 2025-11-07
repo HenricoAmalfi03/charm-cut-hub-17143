@@ -182,7 +182,7 @@ export default function AdminConfiguracoes() {
                   id="nome"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
-                  placeholder="Premium"
+                  placeholder="BRAVO-II"
                   className="flex-1"
                 />
               </div>
@@ -228,7 +228,7 @@ export default function AdminConfiguracoes() {
                 id="endereco"
                 value={endereco}
                 onChange={(e) => setEndereco(e.target.value)}
-                placeholder="Rua Principal, 123 - Centro"
+                placeholder="Rua Cardeal Motta,  - Itanhaém/Suarão"
               />
               <p className="text-xs text-muted-foreground">
                 Este endereço será exibido no rodapé do site
