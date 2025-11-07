@@ -1,5 +1,12 @@
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+self.addEventListener("install", (event) => {
+  console.log("Service Worker: instalado");
+  self.skipWaiting();
+});
 
-createRoot(document.getElementById("root")!).render(<App />);
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker: ativo");
+});
+
+self.addEventListener("fetch", (event) => {
+  // Mantém comportamento padrão (sem cache por enquanto)
+});
