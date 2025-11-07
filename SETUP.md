@@ -20,6 +20,13 @@ Execute os scripts **nesta ordem** no SQL Editor do Supabase:
 1. **`database-schema.sql`** - Cria todas as tabelas, funções e policies
 2. **`storage-setup.sql`** - Configura o bucket de storage (limite 2MB)
 
+**⚠️ IMPORTANTE - Extensão pgcrypto:**
+Se aparecer erro `function gen_salt(unknown) does not exist`, execute primeiro:
+```sql
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
+```
+Depois execute novamente o `database-schema.sql` completo.
+
 ### 3️⃣ Estrutura do Sistema
 
 #### 🔐 Tipos de Contas

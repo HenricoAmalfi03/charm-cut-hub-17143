@@ -33,8 +33,20 @@ DROP TABLE IF EXISTS public.profiles CASCADE;
 DROP TYPE IF EXISTS public.app_role CASCADE;
 DROP TYPE IF EXISTS public.status_agendamento CASCADE;
 
--- Habilitar extensão para criptografia
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+-- =============================
+-- EXTENSIONS
+-- =============================
+-- IMPORTANTE: Execute como superuser ou via Dashboard do Supabase
+-- Se der erro de permissão, execute via SQL Editor do Supabase Dashboard
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA extensions;
+-- Fallback: caso o schema extensions não exista
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pgcrypto') THEN
+    CREATE EXTENSION IF NOT EXISTS pgcrypto;
+  END IF;
+END
+$$;
 
 -- =============================
 -- TYPES
@@ -465,17 +477,27 @@ CREATE POLICY "Admins can manage barbeiros"
   USING (public.is_admin(auth.uid()))
   WITH CHECK (public.is_admin(auth.uid()));
 
--- SERVICOS: Acesso público para leitura
+-- SERVICOS: Acesso público para leitura, admins podem gerenciar
 CREATE POLICY "Public can view active servicos"
   ON public.servicos FOR SELECT
   TO public
   USING (ativo = TRUE);
 
-CREATE POLICY "Admins can manage servicos"
-  ON public.servicos FOR ALL
+CREATE POLICY "Admins can insert servicos"
+  ON public.servicos FOR INSERT
+  TO authenticated
+  WITH CHECK (public.is_admin(auth.uid()));
+
+CREATE POLICY "Admins can update servicos"
+  ON public.servicos FOR UPDATE
   TO authenticated
   USING (public.is_admin(auth.uid()))
   WITH CHECK (public.is_admin(auth.uid()));
+
+CREATE POLICY "Admins can delete servicos"
+  ON public.servicos FOR DELETE
+  TO authenticated
+  USING (public.is_admin(auth.uid()));
 
 -- AGENDAMENTOS: Clientes veem seus próprios, admins veem tudo
 CREATE POLICY "Public can view agendamentos"
@@ -498,12 +520,9 @@ CREATE POLICY "Admins can manage all agendamentos"
 -- GRANTS
 -- =============================
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.create_barbeiro TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_cliente TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.authenticate_barbeiro TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.authenticate_cliente TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.is_admin TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.has_role TO authenticated, anon;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated;
 
 -- =============================
 -- DADOS INICIAIS
