@@ -40,7 +40,7 @@ export default function Dashboard() {
               <Scissors className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Barbearia Premium</h1>
+              <h1 className="text-xl font-bold">Barbearia BRAVO-II</h1>
               <p className="text-sm text-muted-foreground">
                 Painel Administrativo
               </p>
