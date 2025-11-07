@@ -1,0 +1,47 @@
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import ClientAuth from "./pages/ClientAuth";
+import BarberAuth from "./pages/BarberAuth";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import BarbeiroAgenda from "./pages/BarbeiroAgenda";
+import AdminBarbeiros from "./pages/AdminBarbeiros";
+import AdminRelatorios from "./pages/AdminRelatorios";
+import NotFound from "./pages/NotFound";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/admin/auth" element={<Auth />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/cliente/auth" element={<ClientAuth />} />
+            <Route path="/barbeiro/auth" element={<BarberAuth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/barbeiro/agenda" element={<BarbeiroAgenda />} />
+            <Route path="/admin/barbeiros" element={<AdminBarbeiros />} />
+            <Route path="/admin/relatorios" element={<AdminRelatorios />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
+
+export default App;
