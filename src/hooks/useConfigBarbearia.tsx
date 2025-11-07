@@ -9,9 +9,9 @@ interface ConfigBarbearia {
 
 export function useConfigBarbearia() {
   const [config, setConfig] = useState<ConfigBarbearia>({
-    nome_estabelecimento: 'Premium',
+    nome_estabelecimento: 'BRAVO-II',
     logo_url: null,
-    endereco: 'Rua Principal, 123 - Centro'
+    endereco: 'Rua Cardeal Motta - Itanhaém/Suarão'
   });
   const [loading, setLoading] = useState(true);
 
