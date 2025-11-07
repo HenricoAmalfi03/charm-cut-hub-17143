@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Phone, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, Phone, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -35,11 +35,6 @@ export default function BarbeiroAgenda() {
   const [barbeiroId, setBarbeiroId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Barbeiros não são mais auth.users, então removemos esta verificação
-    // Esta página será removida ou adaptada para o novo fluxo
-  }, [user, isAdmin, loading, navigate]);
-
-  useEffect(() => {
     if (user) {
       fetchBarbeiroId();
     }
@@ -49,6 +44,7 @@ export default function BarbeiroAgenda() {
     if (barbeiroId) {
       fetchAgendamentos();
     }
+    // eslint-disable-next-line
   }, [barbeiroId]);
 
   const fetchBarbeiroId = async () => {
@@ -58,7 +54,6 @@ export default function BarbeiroAgenda() {
         .select('id')
         .eq('user_id', user?.id)
         .single();
-
       if (error) throw error;
       setBarbeiroId(data.id);
     } catch (error) {
@@ -99,14 +94,12 @@ export default function BarbeiroAgenda() {
             .select('full_name, phone')
             .eq('id', agendamento.cliente.id)
             .single();
-
           return {
             ...agendamento,
             cliente: profileData || { full_name: 'Cliente', phone: '' },
           };
         })
       );
-
       setAgendamentos(agendamentosComClientes);
     } catch (error) {
       console.error('Erro ao buscar agendamentos:', error);
@@ -120,20 +113,18 @@ export default function BarbeiroAgenda() {
     }
   };
 
+  // Atualiza status para "finalizado"
   const handleConcluir = async (agendamentoId: string) => {
     try {
       const { error } = await supabase
         .from('agendamentos')
-        .update({ status: 'concluido', updated_at: new Date().toISOString() })
+        .update({ status: 'finalizado', updated_at: new Date().toISOString() })
         .eq('id', agendamentoId);
-
       if (error) throw error;
-
       toast({
         title: 'Sucesso',
-        description: 'Atendimento concluído',
+        description: 'Atendimento finalizado',
       });
-
       fetchAgendamentos();
     } catch (error: any) {
       toast({
@@ -144,14 +135,48 @@ export default function BarbeiroAgenda() {
     }
   };
 
+  // Atualiza status para "cancelado"
+  const handleCancelar = async (agendamentoId: string) => {
+    try {
+      const { error } = await supabase
+        .from('agendamentos')
+        .update({ status: 'cancelado', updated_at: new Date().toISOString() })
+        .eq('id', agendamentoId);
+      if (error) throw error;
+      toast({
+        title: 'Cancelado',
+        description: 'Agendamento cancelado',
+      });
+      fetchAgendamentos();
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Badge de status
   const getStatusBadge = (status: string) => {
     const variants: { [key: string]: 'default' | 'secondary' | 'destructive' } = {
-      agendado: 'default',
+      pendente: 'default',
       confirmado: 'secondary',
-      concluido: 'secondary',
+      em_andamento: 'default',
+      finalizado: 'secondary',
       cancelado: 'destructive',
+      nao_compareceu: 'destructive',
     };
-    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
+    // Nome amigável para exibir
+    const nomesAmigaveis: { [key: string]: string } = {
+      pendente: 'Pendente',
+      confirmado: 'Confirmado',
+      em_andamento: 'Em andamento',
+      finalizado: 'Finalizado',
+      cancelado: 'Cancelado',
+      nao_compareceu: 'Não compareceu',
+    };
+    return <Badge variant={variants[status] || 'default'}>{nomesAmigaveis[status] || status}</Badge>;
   };
 
   if (loading || loadingAgendamentos) {
@@ -170,18 +195,15 @@ export default function BarbeiroAgenda() {
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" onClick={() => navigate('/dashboard')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Button>
         </div>
       </header>
-
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">Minha Agenda</h1>
           <p className="text-muted-foreground">Agendamentos futuros</p>
         </div>
-
         {agendamentos.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
@@ -214,7 +236,6 @@ export default function BarbeiroAgenda() {
                       {agendamento.servico.preco.toFixed(2)}
                     </p>
                   </div>
-
                   {agendamento.cliente.phone && (
                     <div className="flex items-center gap-2 text-sm">
                       <Phone className="h-4 w-4" />
@@ -228,23 +249,30 @@ export default function BarbeiroAgenda() {
                       </a>
                     </div>
                   )}
-
                   {agendamento.observacoes && (
                     <div className="text-sm text-muted-foreground">
                       <p className="font-semibold">Observações:</p>
                       <p>{agendamento.observacoes}</p>
                     </div>
                   )}
-
-                  {agendamento.status !== 'concluido' && agendamento.status !== 'cancelado' && (
-                    <Button
-                      onClick={() => handleConcluir(agendamento.id)}
-                      className="w-full"
-                      variant="default"
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Concluir Atendimento
-                    </Button>
+                  {/* Botões de ação só se não estiver finalizado/cancelado */}
+                  {(agendamento.status !== 'finalizado' && agendamento.status !== 'cancelado' && agendamento.status !== 'nao_compareceu') && (
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleConcluir(agendamento.id)}
+                        className="w-full"
+                        variant="default"
+                      >
+                        <Check className="h-4 w-4 mr-2" /> Finalizar Atendimento
+                      </Button>
+                      <Button
+                        onClick={() => handleCancelar(agendamento.id)}
+                        className="w-full"
+                        variant="destructive"
+                      >
+                        <X className="h-4 w-4 mr-2" /> Cancelar
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>
