@@ -8,12 +8,12 @@ values (
   'barbearia',
   'barbearia',
   true,
-  5242880, -- 5MB limit
+  2097152, -- 2MB limit
   array['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 )
 on conflict (id) do update set
   public = true,
-  file_size_limit = 5242880,
+  file_size_limit = 2097152,
   allowed_mime_types = array['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 -- Habilitar RLS no storage

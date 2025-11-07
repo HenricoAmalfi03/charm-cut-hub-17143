@@ -114,10 +114,10 @@ export default function AdminBarbeiros() {
 
   const handleToggleAtivo = async (barbeiroId: string, ativo: boolean) => {
     try {
-      const { error } = await supabase
-        .from('barbeiros')
-        .update({ ativo: !ativo })
-        .eq('id', barbeiroId);
+      const { error } = await supabase.rpc('admin_toggle_barbeiro_ativo', {
+        p_barbeiro_id: barbeiroId,
+        p_ativo: !ativo,
+      });
 
       if (error) throw error;
 

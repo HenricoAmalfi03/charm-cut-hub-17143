@@ -37,7 +37,7 @@ export default function ClientAuth() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
-  const [telefone, setTelefone] = useState('');
+  
   const [whatsapp, setWhatsapp] = useState('');
   const [loading, setLoading] = useState(false);
   
@@ -71,7 +71,7 @@ export default function ClientAuth() {
   };
 
   const handleCadastro = async () => {
-    if (!nomeCompleto || !email || !senha || !telefone) {
+    if (!nomeCompleto || !email || !senha || !whatsapp) {
       toast({
         title: 'Erro',
         description: 'Preencha todos os campos',
@@ -86,8 +86,7 @@ export default function ClientAuth() {
         p_nome: nomeCompleto,
         p_email: email,
         p_senha: senha,
-        p_telefone: telefone,
-        p_whatsapp: whatsapp || telefone
+        p_whatsapp: whatsapp
       });
 
       if (error) throw error;
@@ -99,7 +98,6 @@ export default function ClientAuth() {
       
       setIsLogin(true);
       setNomeCompleto('');
-      setTelefone('');
       setWhatsapp('');
     } catch (error: any) {
       toast({
@@ -346,13 +344,8 @@ export default function ClientAuth() {
                   <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="(00) 00000-0000" />
-                </div>
-                <div className="space-y-2">
-                  <Label>WhatsApp (opcional)</Label>
+                  <Label>WhatsApp</Label>
                   <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(00) 00000-0000" />
-                  <p className="text-xs text-muted-foreground">Se vazio, usaremos o telefone</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Senha</Label>

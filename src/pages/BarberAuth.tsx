@@ -39,6 +39,7 @@ export default function BarberAuth() {
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [whatsappEdit, setWhatsappEdit] = useState('');
   const [avatarUrlEdit, setAvatarUrlEdit] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (barbeiroLogado) {
@@ -132,18 +133,12 @@ export default function BarberAuth() {
 
   const handleStatusChange = async (agendamentoId: string, novoStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('agendamentos')
-        .update({ 
-          status: novoStatus,
-          updated_at: new Date().toISOString() 
-        })
-        .eq('id', agendamentoId);
+      const { error } = await supabase.rpc('update_agendamento_status', {
+        p_agendamento_id: agendamentoId,
+        p_status: novoStatus,
+      });
 
-      if (error) {
-        console.error('Erro ao atualizar status:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: 'Sucesso',
@@ -152,7 +147,6 @@ export default function BarberAuth() {
 
       await fetchAgendamentos();
     } catch (error: any) {
-      console.error('Erro completo:', error);
       toast({
         title: 'Erro',
         description: error.message || 'Não foi possível atualizar o status',
@@ -175,18 +169,33 @@ export default function BarberAuth() {
 
   const handleUpdatePerfil = async () => {
     try {
-      const { error } = await supabase
-        .from('barbeiros')
-        .update({
-          whatsapp: whatsappEdit,
-          avatar_url: avatarUrlEdit
-        })
-        .eq('id', barbeiroLogado.id);
+      let finalAvatarUrl = avatarUrlEdit || '';
+
+      if (avatarFile) {
+        if (avatarFile.size > 2 * 1024 * 1024) {
+          throw new Error('A imagem deve ter no máximo 2MB');
+        }
+        const ext = avatarFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const filePath = `barbeiros/${barbeiroLogado.id}/avatar-${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from('barbearia')
+          .upload(filePath, avatarFile, { upsert: true, contentType: avatarFile.type });
+        if (uploadError) throw uploadError;
+        const { data: pub } = supabase.storage.from('barbearia').getPublicUrl(filePath);
+        finalAvatarUrl = pub.publicUrl;
+      }
+
+      const { error } = await supabase.rpc('update_barbeiro_perfil', {
+        p_barbeiro_id: barbeiroLogado.id,
+        p_whatsapp: whatsappEdit,
+        p_avatar_url: finalAvatarUrl,
+      });
 
       if (error) throw error;
 
-      setBarbeiroLogado({ ...barbeiroLogado, whatsapp: whatsappEdit, avatar_url: avatarUrlEdit });
+      setBarbeiroLogado({ ...barbeiroLogado, whatsapp: whatsappEdit, avatar_url: finalAvatarUrl });
       setEditandoPerfil(false);
+      setAvatarFile(null);
       toast({
         title: 'Perfil atualizado!',
         description: 'Suas informações foram atualizadas com sucesso',
@@ -258,11 +267,14 @@ export default function BarberAuth() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>URL da Foto</Label>
+                    <Label>Foto (até 2MB)</Label>
                     <Input 
-                      value={avatarUrlEdit} 
-                      onChange={(e) => setAvatarUrlEdit(e.target.value)} 
-                      placeholder="https://exemplo.com/foto.jpg" 
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0] || null;
+                        setAvatarFile(f);
+                      }}
                     />
                   </div>
                   <Button onClick={handleUpdatePerfil} className="w-full">
@@ -306,7 +318,7 @@ export default function BarberAuth() {
                         </div>
                         <div>
                           <p className="font-medium">{agendamento.cliente?.nome_completo}</p>
-                          <p className="text-sm text-muted-foreground">{agendamento.cliente?.telefone}</p>
+                          <p className="text-sm text-muted-foreground">{agendamento.cliente?.whatsapp}</p>
                         </div>
                         <div>
                           <p className="text-sm">
@@ -348,17 +360,9 @@ export default function BarberAuth() {
                         {agendamento.status === 'confirmado' && (
                           <Button 
                             size="sm" 
-                            onClick={() => handleStatusChange(agendamento.id, 'em_andamento')}
-                          >
-                            Iniciar
-                          </Button>
-                        )}
-                        {agendamento.status === 'em_andamento' && (
-                          <Button 
-                            size="sm" 
                             onClick={() => handleStatusChange(agendamento.id, 'finalizado')}
                           >
-                            Finalizar
+                            Realizado
                           </Button>
                         )}
                         {(agendamento.status === 'pendente' || agendamento.status === 'confirmado') && (
