@@ -510,7 +510,8 @@ declare v_id uuid; begin
 end; $$;
 
 -- Storage (Bucket) ----------------------------------------------------------
--- Create bucket 'barbearia' with 2MB limit and image mime types
+-- Criar bucket 'barbearia' com limite 2MB e tipos de imagem
+-- NOTA: storage.objects já tem RLS habilitado por padrão, não precisamos alterar
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'barbearia', 'barbearia', true, 2097152,
@@ -521,14 +522,14 @@ on conflict (id) do update set
   file_size_limit = 2097152,
   allowed_mime_types = array['image/jpeg','image/jpg','image/png','image/webp'];
 
-alter table storage.objects enable row level security;
-
--- Reset conflicting policies (safe if absent)
+-- Limpar políticas antigas do bucket (se existirem)
 drop policy if exists "Public Access" on storage.objects;
 drop policy if exists "Authenticated users can upload" on storage.objects;
 drop policy if exists "Users can update uploads" on storage.objects;
 drop policy if exists "Users can delete uploads" on storage.objects;
 
+-- Políticas para o bucket 'barbearia'
+-- Admin faz upload de logo, barbeiros fazem upload de foto de perfil
 create policy "Public Access"
   on storage.objects for select
   using ( bucket_id = 'barbearia' );
