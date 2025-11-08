@@ -94,12 +94,14 @@ as $$
 $$;
 
 -- Policies for user_roles
-create policy if not exists "Users see own roles"
+drop policy if exists "Users see own roles" on public.user_roles;
+create policy "Users see own roles"
   on public.user_roles for select
   to authenticated
   using (user_id = auth.uid());
 
-create policy if not exists "Admins manage roles"
+drop policy if exists "Admins manage roles" on public.user_roles;
+create policy "Admins manage roles"
   on public.user_roles for all
   to authenticated
   using (public.has_role(auth.uid(), 'admin'))
@@ -116,18 +118,21 @@ create table public.profiles (
 
 alter table public.profiles enable row level security;
 
-create policy if not exists "Users can view own profile"
+drop policy if exists "Users can view own profile" on public.profiles;
+create policy "Users can view own profile"
   on public.profiles for select
   to authenticated
   using (id = auth.uid());
 
-create policy if not exists "Users update own profile"
+drop policy if exists "Users update own profile" on public.profiles;
+create policy "Users update own profile"
   on public.profiles for update
   to authenticated
   using (id = auth.uid())
   with check (id = auth.uid());
 
-create policy if not exists "Admins can view all profiles"
+drop policy if exists "Admins can view all profiles" on public.profiles;
+create policy "Admins can view all profiles"
   on public.profiles for select
   to authenticated
   using (public.has_role(auth.uid(),'admin'));
@@ -173,11 +178,13 @@ create table public.configuracoes_barbearia (
 
 alter table public.configuracoes_barbearia enable row level security;
 
-create policy if not exists "Public can read settings"
+drop policy if exists "Public can read settings" on public.configuracoes_barbearia;
+create policy "Public can read settings"
   on public.configuracoes_barbearia for select
   using (true);
 
-create policy if not exists "Admins can manage settings"
+drop policy if exists "Admins can manage settings" on public.configuracoes_barbearia;
+create policy "Admins can manage settings"
   on public.configuracoes_barbearia for all
   to authenticated
   using (public.has_role(auth.uid(),'admin'))
@@ -203,11 +210,13 @@ create table public.horarios_funcionamento (
 
 alter table public.horarios_funcionamento enable row level security;
 
-create policy if not exists "Public read horarios"
+drop policy if exists "Public read horarios" on public.horarios_funcionamento;
+create policy "Public read horarios"
   on public.horarios_funcionamento for select
   using (true);
 
-create policy if not exists "Admins manage horarios"
+drop policy if exists "Admins manage horarios" on public.horarios_funcionamento;
+create policy "Admins manage horarios"
   on public.horarios_funcionamento for all
   to authenticated
   using (public.has_role(auth.uid(),'admin'))
@@ -239,11 +248,13 @@ create table public.barbeiros (
 
 alter table public.barbeiros enable row level security;
 
-create policy if not exists "Public read barbeiros"
+drop policy if exists "Public read barbeiros" on public.barbeiros;
+create policy "Public read barbeiros"
   on public.barbeiros for select
   using (true);
 
-create policy if not exists "Admins manage barbeiros"
+drop policy if exists "Admins manage barbeiros" on public.barbeiros;
+create policy "Admins manage barbeiros"
   on public.barbeiros for all
   to authenticated
   using (public.has_role(auth.uid(),'admin'))
@@ -266,7 +277,8 @@ create table public.clientes (
 
 alter table public.clientes enable row level security;
 
-create policy if not exists "Admin read clientes"
+drop policy if exists "Admin read clientes" on public.clientes;
+create policy "Admin read clientes"
   on public.clientes for select
   to authenticated
   using (public.has_role(auth.uid(),'admin'));
@@ -288,11 +300,13 @@ create table public.servicos (
 
 alter table public.servicos enable row level security;
 
-create policy if not exists "Public read servicos"
+drop policy if exists "Public read servicos" on public.servicos;
+create policy "Public read servicos"
   on public.servicos for select
   using (true);
 
-create policy if not exists "Admins manage servicos"
+drop policy if exists "Admins manage servicos" on public.servicos;
+create policy "Admins manage servicos"
   on public.servicos for all
   to authenticated
   using (public.has_role(auth.uid(),'admin'))
@@ -321,7 +335,8 @@ create table public.agendamentos (
 alter table public.agendamentos enable row level security;
 
 -- Select liberado para leitura em telas públicas (ajuste se necessário)
-create policy if not exists "Public read agendamentos"
+drop policy if exists "Public read agendamentos" on public.agendamentos;
+create policy "Public read agendamentos"
   on public.agendamentos for select
   using (true);
 
