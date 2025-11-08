@@ -9,7 +9,6 @@ import Auth from "./pages/Auth";
 import ClientAuth from "./pages/ClientAuth";
 import BarberAuth from "./pages/BarberAuth";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
 import BarbeiroAgenda from "./pages/BarbeiroAgenda";
 import AdminBarbeiros from "./pages/AdminBarbeiros";
 import AdminRelatorios from "./pages/AdminRelatorios";
@@ -33,7 +32,6 @@ const App = () => (
             <Route path="/cliente/auth" element={<ClientAuth />} />
             <Route path="/barbeiro/auth" element={<BarberAuth />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/barbeiro/agenda" element={<BarbeiroAgenda />} />
             <Route path="/admin/barbeiros" element={<AdminBarbeiros />} />
             <Route path="/admin/relatorios" element={<AdminRelatorios />} />
