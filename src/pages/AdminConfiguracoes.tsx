@@ -106,15 +106,25 @@ export default function AdminConfiguracoes() {
     try {
       setSaving(true);
 
+      // Buscar o primeiro registro para pegar o ID
+      const { data: currentConfig } = await supabase
+        .from('configuracoes_barbearia')
+        .select('id')
+        .limit(1)
+        .single();
+
+      if (!currentConfig) {
+        throw new Error('Configuração não encontrada');
+      }
+
       const { error } = await supabase
         .from('configuracoes_barbearia')
         .update({
           nome_estabelecimento: nome,
           logo_url: logoUrl || null,
-          endereco: endereco,
-          updated_at: new Date().toISOString()
+          endereco: endereco
         })
-        .eq('id', configuracoes?.id);
+        .eq('id', currentConfig.id);
 
       if (error) throw error;
 
@@ -123,8 +133,9 @@ export default function AdminConfiguracoes() {
         description: 'Configurações salvas com sucesso',
       });
 
-      fetchConfiguracoes();
+      await fetchConfiguracoes();
     } catch (error: any) {
+      console.error('Erro ao salvar:', error);
       toast({
         title: 'Erro',
         description: error.message,

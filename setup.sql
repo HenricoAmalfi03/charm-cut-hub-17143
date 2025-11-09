@@ -291,6 +291,7 @@ for each row execute function public.update_updated_at_column();
 create table public.servicos (
   id uuid primary key default gen_random_uuid(),
   nome text not null,
+  descricao text,
   preco numeric(10,2) not null,
   duracao_minutos integer not null check (duracao_minutos > 0),
   ativo boolean not null default true,

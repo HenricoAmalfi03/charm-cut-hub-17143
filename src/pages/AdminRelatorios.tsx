@@ -18,6 +18,7 @@ import {
   FileDown,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useConfigBarbearia } from '@/hooks/useConfigBarbearia';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -33,6 +34,7 @@ export default function AdminRelatorios() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { config } = useConfigBarbearia();
 
   const [relatorio, setRelatorio] = useState<RelatorioData>({
     totalAgendamentos: 0,
@@ -165,7 +167,7 @@ export default function AdminRelatorios() {
       // Gerar PDF
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text('Relatório Completo - Barbearia Premium', 14, 20);
+      doc.text(`Relatório Completo - Barbearia ${config.nome_estabelecimento}`, 14, 20);
       doc.setFontSize(11);
       doc.text(
         `Data do Relatório: ${new Date().toLocaleDateString('pt-BR')}`,
