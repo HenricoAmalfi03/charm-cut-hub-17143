@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, Scissors, Users, Settings } from 'lucide-react';
+import { LogOut, Users, Settings } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -36,9 +36,6 @@ export default function Dashboard() {
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Scissors className="h-6 w-6 text-primary" />
-            </div>
             <div>
               <h1 className="text-xl font-bold">Barbearia BRAVO-II</h1>
               <p className="text-sm text-muted-foreground">
@@ -88,7 +85,7 @@ export default function Dashboard() {
 
           <Card className="border-primary/20 hover:border-primary/40 transition-colors">
             <CardHeader>
-              <Scissors className="h-8 w-8 text-primary mb-2" />
+              
               <CardTitle>Serviços</CardTitle>
               <CardDescription>Gerenciar serviços e valores</CardDescription>
             </CardHeader>

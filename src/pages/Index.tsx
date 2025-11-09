@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useConfigBarbearia } from '@/hooks/useConfigBarbearia';
-import { Scissors, Calendar, Users, Star } from 'lucide-react';
+import { Calendar, Users, Star } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -27,11 +27,6 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-full bg-primary/10 backdrop-blur-sm">
-                <Scissors className="h-16 w-16 text-primary" />
-              </div>
-            </div>
             <h1 className="text-5xl md:text-6xl font-bold leading-tight">
               Barbearia <span className="text-primary">{config.nome_estabelecimento}</span>
             </h1>

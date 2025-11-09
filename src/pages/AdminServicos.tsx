@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, Plus, Scissors, Pencil } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Servico {
@@ -306,7 +306,7 @@ export default function AdminServicos() {
         {servicos.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <Scissors className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              
               <p className="text-muted-foreground">Nenhum serviço cadastrado</p>
             </CardContent>
           </Card>

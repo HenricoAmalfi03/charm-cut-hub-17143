@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Calendar as CalendarIcon, User, Clock, Scissors } from 'lucide-react';
+import { ArrowLeft, Calendar as CalendarIcon, User, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useEffect } from 'react';
@@ -215,7 +215,6 @@ export default function ClientAuth() {
           <Card className="border-primary/20">
             <CardHeader>
               <CardTitle className="text-2xl flex items-center gap-2">
-                <Scissors className="h-6 w-6 text-primary" />
                 Agendar Horário
               </CardTitle>
               <CardDescription>

@@ -12,7 +12,6 @@ import {
 import {
   ArrowLeft,
   DollarSign,
-  Scissors,
   TrendingUp,
   Users,
   FileDown,
@@ -321,7 +320,6 @@ export default function AdminRelatorios() {
               <CardTitle className="text-sm font-medium">
                 Total de Agendamentos
               </CardTitle>
-              <Scissors className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -372,7 +370,7 @@ export default function AdminRelatorios() {
               <CardTitle className="text-sm font-medium">
                 Taxa de Finalização
               </CardTitle>
-              <Scissors className="h-4 w-4 text-muted-foreground" />
+              
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { Scissors, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Auth() {
@@ -58,11 +58,6 @@ export default function Auth() {
       </div>
       <Card className="w-full max-w-md border-primary/20">
         <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center mb-2">
-            <div className="p-3 rounded-full bg-primary/10">
-              <Scissors className="h-8 w-8 text-primary" />
-            </div>
-          </div>
           <CardTitle className="text-3xl font-bold">Admin - Barbearia Premium</CardTitle>
           <CardDescription>Apenas administradores podem acessar</CardDescription>
         </CardHeader>

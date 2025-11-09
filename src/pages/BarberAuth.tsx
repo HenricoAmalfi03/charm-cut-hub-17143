@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Scissors, Calendar, Clock, MessageCircle, User, Camera } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MessageCircle, User, Camera } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -226,7 +226,6 @@ export default function BarberAuth() {
           <Card className="border-primary/20 mb-6">
             <CardHeader>
               <CardTitle className="text-2xl flex items-center gap-2">
-                <Scissors className="h-6 w-6 text-primary" />
                 Painel do Barbeiro
               </CardTitle>
               <CardDescription>
