@@ -466,7 +466,8 @@ $$;
 create or replace function public.create_cliente(
   p_nome text,
   p_email text,
-  p_senha text
+  p_senha text,
+  p_whatsapp text
 ) returns uuid
 language plpgsql
 security definer
@@ -476,9 +477,7 @@ declare
   v_id uuid;
 begin
   insert into public.clientes (nome_completo, email, senha_hash, whatsapp)
-  values (p_nome, p_email, crypt(p_senha, gen_salt('bf')), '');
-  -- Ajuste: app já tornou whatsapp obrigatório no front; 
-  -- se quiser forçar aqui, mude a assinatura para incluir p_whatsapp e valide.
+  values (p_nome, p_email, crypt(p_senha, gen_salt('bf')), p_whatsapp);
 
   select id into v_id from public.clientes where email = p_email;
   return v_id;

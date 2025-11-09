@@ -55,7 +55,10 @@ export default function AdminConfiguracoes() {
       setConfiguracoes(data);
       setNome(data.nome_estabelecimento);
       setEndereco(data.endereco);
-      setLogoUrl(data.logo_url || '');
+      // Adicionar cache bust para forçar refresh da imagem
+      const logoUrlWithCacheBust = data.logo_url ? `${data.logo_url}?t=${Date.now()}` : '';
+      setLogoUrl(logoUrlWithCacheBust);
+      console.log('Logo URL:', logoUrlWithCacheBust);
     } catch (error) {
       console.error('Erro ao buscar configurações:', error);
     } finally {
@@ -85,11 +88,26 @@ export default function AdminConfiguracoes() {
         .from('barbearia')
         .getPublicUrl(fileName);
 
+      console.log('Logo uploaded. Public URL:', publicUrl);
       setLogoUrl(publicUrl);
+
+      // Salvar automaticamente no banco
+      const { data: currentConfig } = await supabase
+        .from('configuracoes_barbearia')
+        .select('id')
+        .limit(1)
+        .single();
+
+      if (currentConfig) {
+        await supabase
+          .from('configuracoes_barbearia')
+          .update({ logo_url: publicUrl })
+          .eq('id', currentConfig.id);
+      }
 
       toast({
         title: 'Sucesso',
-        description: 'Logo enviada com sucesso',
+        description: 'Logo enviada e salva com sucesso',
       });
     } catch (error: any) {
       toast({
